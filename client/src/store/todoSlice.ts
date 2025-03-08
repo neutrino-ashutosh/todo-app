@@ -5,30 +5,17 @@ interface TodoState {
   tasks: Task[];
   loading: boolean;
   error: string | null;
+  currentView: 'all' | 'today' | 'important' | 'planned' | 'assigned';
 }
 
 const initialState: TodoState = {
   tasks: JSON.parse(sessionStorage.getItem('tasks') || '[]'),
   loading: false,
   error: null,
+  currentView: 'today'
 };
 
-// Weather API configuration
-const WEATHER_API_KEY = "16d4f6d2450759ca1741fcf63413254a";
-const WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5";
-
 let currentId = parseInt(sessionStorage.getItem('currentTaskId') || '1');
-
-export const fetchWeather = createAsyncThunk(
-  "todos/fetchWeather",
-  async () => {
-    const response = await fetch(
-      `${WEATHER_BASE_URL}/weather?lat=51.5074&lon=-0.1278&units=metric&appid=${WEATHER_API_KEY}`
-    );
-    if (!response.ok) throw new Error('Weather API error');
-    return response.json();
-  }
-);
 
 export const addTask = createAsyncThunk(
   "todos/addTask",
@@ -41,6 +28,7 @@ export const addTask = createAsyncThunk(
       priority: task.priority,
       isOutdoor: task.isOutdoor,
       dueDate: task.dueDate,
+      city: task.city,
       weather: null
     };
     sessionStorage.setItem('currentTaskId', currentId.toString());
@@ -66,7 +54,11 @@ export const deleteTask = createAsyncThunk(
 const todoSlice = createSlice({
   name: "todos",
   initialState,
-  reducers: {},
+  reducers: {
+    setView: (state, action: PayloadAction<TodoState['currentView']>) => {
+      state.currentView = action.payload;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(addTask.fulfilled, (state, action: PayloadAction<Task>) => {
@@ -87,4 +79,5 @@ const todoSlice = createSlice({
   },
 });
 
+export const { setView } = todoSlice.actions;
 export default todoSlice.reducer;

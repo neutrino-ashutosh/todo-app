@@ -1,11 +1,24 @@
 import { useAuth } from "@/hooks/use-auth";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/store/store";
+import { setView } from "@/store/todoSlice";
 import TaskInput from "@/components/TaskInput";
 import TaskList from "@/components/TaskList";
 import { Button } from "@/components/ui/button";
-import { LogOut, AlignJustify, Search, Calendar, Star, List, Users } from "lucide-react";
+import { LogOut, AlignJustify, Calendar, Star, List, Users } from "lucide-react";
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
+  const currentView = useSelector((state: RootState) => state.todos.currentView);
+
+  const viewLabels = {
+    all: "All Tasks",
+    today: "Today",
+    important: "Important",
+    planned: "Planned",
+    assigned: "Assigned to me"
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -19,7 +32,7 @@ export default function HomePage() {
               className="w-12 h-12 rounded-full"
             />
             <div>
-              <h2 className="font-medium">Hey, {user?.username}</h2>
+              <h2 className="font-medium">Hey, {user?.username || 'User'}</h2>
             </div>
           </div>
         </div>
@@ -27,31 +40,51 @@ export default function HomePage() {
         <nav className="flex-1">
           <ul className="space-y-2">
             <li>
-              <Button variant="ghost" className="w-full justify-start">
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-start ${currentView === 'all' ? 'bg-green-50 text-green-700' : ''}`}
+                onClick={() => dispatch(setView('all'))}
+              >
                 <AlignJustify className="mr-2 h-4 w-4" />
                 All Tasks
               </Button>
             </li>
             <li>
-              <Button variant="ghost" className="w-full justify-start bg-green-50 text-green-700">
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-start ${currentView === 'today' ? 'bg-green-50 text-green-700' : ''}`}
+                onClick={() => dispatch(setView('today'))}
+              >
                 <Calendar className="mr-2 h-4 w-4" />
                 Today
               </Button>
             </li>
             <li>
-              <Button variant="ghost" className="w-full justify-start">
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-start ${currentView === 'important' ? 'bg-green-50 text-green-700' : ''}`}
+                onClick={() => dispatch(setView('important'))}
+              >
                 <Star className="mr-2 h-4 w-4" />
                 Important
               </Button>
             </li>
             <li>
-              <Button variant="ghost" className="w-full justify-start">
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-start ${currentView === 'planned' ? 'bg-green-50 text-green-700' : ''}`}
+                onClick={() => dispatch(setView('planned'))}
+              >
                 <List className="mr-2 h-4 w-4" />
                 Planned
               </Button>
             </li>
             <li>
-              <Button variant="ghost" className="w-full justify-start">
+              <Button 
+                variant="ghost" 
+                className={`w-full justify-start ${currentView === 'assigned' ? 'bg-green-50 text-green-700' : ''}`}
+                onClick={() => dispatch(setView('assigned'))}
+              >
                 <Users className="mr-2 h-4 w-4" />
                 Assigned to me
               </Button>
@@ -81,7 +114,7 @@ export default function HomePage() {
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Today Tasks</h2>
+              <h2 className="text-lg font-semibold">{viewLabels[currentView]} Tasks</h2>
               <div className="flex items-center gap-2">
                 <div className="text-sm text-muted-foreground">11</div>
               </div>

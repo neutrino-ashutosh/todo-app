@@ -5,23 +5,39 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import WeatherInfo from "./WeatherInfo";
 import { Calendar, Star, Trash2 } from "lucide-react";
-import { format } from "date-fns";
+import { format, isToday } from "date-fns";
 
 export default function TaskList() {
   const dispatch = useDispatch<AppDispatch>();
-  const { tasks } = useSelector((state: RootState) => state.todos);
+  const { tasks, currentView } = useSelector((state: RootState) => state.todos);
 
-  if (tasks.length === 0) {
+  // Filter tasks based on current view
+  const filteredTasks = tasks.filter(task => {
+    switch (currentView) {
+      case 'today':
+        return task.dueDate ? isToday(new Date(task.dueDate)) : false;
+      case 'important':
+        return task.priority === 'high';
+      case 'planned':
+        return task.dueDate !== null;
+      case 'assigned':
+        return true; // In this demo, all tasks are assigned to the user
+      default:
+        return true; // 'all' view shows all tasks
+    }
+  });
+
+  // Group tasks by completion status
+  const activeTasks = filteredTasks.filter(task => !task.completed);
+  const completedTasks = filteredTasks.filter(task => task.completed);
+
+  if (filteredTasks.length === 0) {
     return (
       <div className="text-center p-8 text-muted-foreground">
         No tasks yet. Add some tasks to get started!
       </div>
     );
   }
-
-  // Group tasks by completion status
-  const activeTasks = tasks.filter(task => !task.completed);
-  const completedTasks = tasks.filter(task => task.completed);
 
   return (
     <div className="space-y-6">
@@ -49,7 +65,7 @@ export default function TaskList() {
                       <span>{format(new Date(task.dueDate), "PP")}</span>
                     </div>
                   )}
-                  {task.isOutdoor && <WeatherInfo task={task} />}
+                  {task.isOutdoor && task.city && <WeatherInfo task={task} />}
                 </div>
               </div>
               <div className="flex items-center gap-2">

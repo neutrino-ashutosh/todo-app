@@ -24,13 +24,14 @@ export default function WeatherInfo({ task }: WeatherInfoProps) {
   const { data: weather, isLoading, error } = useQuery<WeatherData>({
     queryKey: ["weather", task.city],
     queryFn: async () => {
+      if (!task.city) throw new Error('No city specified');
       const response = await fetch(
         `${WEATHER_BASE_URL}/weather?q=${encodeURIComponent(task.city)}&units=metric&appid=${WEATHER_API_KEY}`
       );
       if (!response.ok) throw new Error('Failed to fetch weather');
       return response.json();
     },
-    enabled: task.isOutdoor && task.city,
+    enabled: Boolean(task.isOutdoor && task.city),
   });
 
   if (!task.isOutdoor || !task.city) return null;
