@@ -3,13 +3,9 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertTaskSchema } from "@shared/schema";
-import OpenWeatherMap from "openweathermap-ts";
 
-// Initialize OpenWeatherMap with proper configuration
-const weatherAPI = new OpenWeatherMap({
-  apiKey: process.env.VITE_OPENWEATHER_API_KEY || "",
-  units: "metric"
-});
+const OPENWEATHER_API_KEY = "16d4f6d2450759ca1741fcf63413254a";
+const OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5";
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
@@ -21,17 +17,23 @@ export function registerRoutes(app: Express): Server {
 
   app.get("/api/weather", async (req, res) => {
     try {
-      // Use the correct method from the OpenWeatherMap API
-      const weather = await weatherAPI.getCurrentWeatherByGeoCoordinates(
-        51.5074, // London coordinates for demo
-        -0.1278
+      console.log("Fetching weather data...");
+      const response = await fetch(
+        `${OPENWEATHER_BASE_URL}/weather?lat=51.5074&lon=-0.1278&units=metric&appid=${OPENWEATHER_API_KEY}`
       );
 
+      if (!response.ok) {
+        throw new Error(`OpenWeather API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("Weather data received:", data);
+
       res.json({
-        condition: weather.weather[0].main,
-        temp: weather.main.temp,
-        humidity: weather.main.humidity,
-        windSpeed: weather.wind.speed
+        condition: data.weather[0].main,
+        temp: data.main.temp,
+        humidity: data.main.humidity,
+        windSpeed: data.wind.speed
       });
     } catch (error) {
       console.error('Weather API Error:', error);
