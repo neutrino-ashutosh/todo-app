@@ -78,9 +78,9 @@ export default function AuthPage() {
                       name="username"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Username</FormLabel>
+                          <FormLabel htmlFor="login-username">Username</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                          <Input id="login-username" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -91,9 +91,9 @@ export default function AuthPage() {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel htmlFor="login-password">Password</FormLabel>
                           <FormControl>
-                            <Input type="password" {...field} />
+                          <Input id="login-password" type="password" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -123,9 +123,9 @@ export default function AuthPage() {
                       name="username"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Username</FormLabel>
+                          <FormLabel htmlFor="register-username">Username</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                          <Input id="register-username" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -136,9 +136,9 @@ export default function AuthPage() {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Password</FormLabel>
+                          <FormLabel htmlFor="register-password">Password</FormLabel>
                           <FormControl>
-                            <Input type="password" {...field} />
+                          <Input id="register-password" type="password" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

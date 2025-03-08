@@ -56,6 +56,26 @@ export default function HomePage() {
               <h2 className="font-medium dark:text-white">Hey, {user?.username || 'User'}</h2>
             </div>
           </div>
+          <Button 
+            variant="outline" 
+            className="mt-4 w-full"
+            onClick={() => {
+              logoutMutation.mutate(undefined, {
+                onSuccess: () => {
+                  // Clear any stored auth state
+                  localStorage.removeItem('user');
+                  sessionStorage.removeItem('user');
+                  
+                  // Add a small delay before redirect to ensure logout is processed
+                  setTimeout(() => {
+                    window.location.href = '/auth';
+                  }, 100);
+                }
+              });
+            }}
+          >
+            Logout
+          </Button>
         </div>
 
         <nav className="mt-8 flex-1">
