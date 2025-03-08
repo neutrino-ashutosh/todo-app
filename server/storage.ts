@@ -1,8 +1,4 @@
 import { InsertUser, User, InsertTask, Task } from "@shared/schema";
-import session from "express-session";
-import createMemoryStore from "memorystore";
-
-const MemoryStore = createMemoryStore(session);
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -12,13 +8,11 @@ export interface IStorage {
   createTask(userId: number, task: InsertTask): Promise<Task>;
   toggleTask(userId: number, taskId: number): Promise<Task | undefined>;
   deleteTask(userId: number, taskId: number): Promise<void>;
-  sessionStore: session.Store;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private tasks: Map<number, Task>;
-  public sessionStore: session.Store;
   private currentUserId: number;
   private currentTaskId: number;
 
@@ -27,9 +21,6 @@ export class MemStorage implements IStorage {
     this.tasks = new Map();
     this.currentUserId = 1;
     this.currentTaskId = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
-    });
   }
 
   async getUser(id: number): Promise<User | undefined> {

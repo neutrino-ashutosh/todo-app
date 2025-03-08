@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema } from "@shared/schema";
 import { Button } from "@/components/ui/button";
@@ -26,10 +27,11 @@ export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
 
-  if (user) {
-    setLocation("/");
-    return null;
-  }
+  useEffect(() => {
+    if (user) {
+      setLocation("/");
+    }
+  }, [user, setLocation]);
 
   const loginForm = useForm({
     resolver: zodResolver(insertUserSchema),
@@ -40,6 +42,11 @@ export default function AuthPage() {
     resolver: zodResolver(insertUserSchema),
     defaultValues: { username: "", password: "" },
   });
+
+  // Don't render anything while redirecting
+  if (user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen grid md:grid-cols-2">
