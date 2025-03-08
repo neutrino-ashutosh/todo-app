@@ -19,6 +19,7 @@ export default function TaskInput() {
   const [priority, setPriority] = useState("medium");
   const [isOutdoor, setIsOutdoor] = useState(false);
   const [date, setDate] = useState<Date | null>(null);
+  const [city, setCity] = useState("London");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,10 +29,17 @@ export default function TaskInput() {
       title, 
       priority, 
       isOutdoor,
-      dueDate: date 
+      dueDate: date,
+      city 
     }));
     setTitle("");
     setDate(null);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSubmit(e);
+    }
   };
 
   const handleDateSelect = (newDate: Date | undefined) => {
@@ -47,6 +55,7 @@ export default function TaskInput() {
             id="task"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            onKeyPress={handleKeyPress}
             placeholder="What needs to be done?"
             className="mt-1"
           />
@@ -94,13 +103,28 @@ export default function TaskInput() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Switch
-            id="outdoor"
-            checked={isOutdoor}
-            onCheckedChange={setIsOutdoor}
-          />
-          <Label htmlFor="outdoor">Outdoor Activity</Label>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Switch
+              id="outdoor"
+              checked={isOutdoor}
+              onCheckedChange={setIsOutdoor}
+            />
+            <Label htmlFor="outdoor">Outdoor Activity</Label>
+          </div>
+
+          {isOutdoor && (
+            <div>
+              <Label htmlFor="city">City</Label>
+              <Input
+                id="city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="Enter city name"
+                className="mt-1"
+              />
+            </div>
+          )}
         </div>
       </div>
 

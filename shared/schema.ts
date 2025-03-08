@@ -1,5 +1,4 @@
 import { pgTable, text, serial, integer, boolean, jsonb, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable("users", {
@@ -17,21 +16,34 @@ export const tasks = pgTable("tasks", {
   isOutdoor: boolean("is_outdoor").notNull().default(false),
   dueDate: timestamp("due_date"),
   weather: jsonb("weather"),
+  city: text("city"), // Added city field
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+export const insertUserSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-export const insertTaskSchema = createInsertSchema(tasks).pick({
-  title: true,
-  priority: true,
-  isOutdoor: true,
-  dueDate: true,
+export const insertTaskSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  priority: z.enum(["low", "medium", "high"]).default("medium"),
+  isOutdoor: z.boolean().default(false),
+  dueDate: z.date().nullable(),
+  city: z.string().optional()
 });
+
+export interface Task {
+  id: number;
+  userId: number;
+  title: string;
+  completed: boolean;
+  priority: string;
+  isOutdoor: boolean;
+  dueDate: Date | null;
+  city?: string;
+  weather: any | null;
+}
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
-export type Task = typeof tasks.$inferSelect;
 export type InsertTask = z.infer<typeof insertTaskSchema>;

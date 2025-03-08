@@ -22,24 +22,24 @@ const WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5";
 
 export default function WeatherInfo({ task }: WeatherInfoProps) {
   const { data: weather, isLoading, error } = useQuery<WeatherData>({
-    queryKey: ["weather"],
+    queryKey: ["weather", task.city],
     queryFn: async () => {
       const response = await fetch(
-        `${WEATHER_BASE_URL}/weather?lat=51.5074&lon=-0.1278&units=metric&appid=${WEATHER_API_KEY}`
+        `${WEATHER_BASE_URL}/weather?q=${encodeURIComponent(task.city)}&units=metric&appid=${WEATHER_API_KEY}`
       );
       if (!response.ok) throw new Error('Failed to fetch weather');
       return response.json();
     },
-    enabled: task.isOutdoor,
+    enabled: task.isOutdoor && task.city,
   });
 
-  if (!task.isOutdoor) return null;
+  if (!task.isOutdoor || !task.city) return null;
 
   if (isLoading) {
     return (
       <div className="flex items-center gap-2 text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
-        <span className="text-sm">Loading weather...</span>
+        <span className="text-sm">Loading weather for {task.city}...</span>
       </div>
     );
   }
@@ -47,7 +47,7 @@ export default function WeatherInfo({ task }: WeatherInfoProps) {
   if (error || !weather) {
     return (
       <div className="text-sm text-red-500">
-        Could not load weather data
+        Could not load weather data for {task.city}
       </div>
     );
   }
@@ -68,7 +68,7 @@ export default function WeatherInfo({ task }: WeatherInfoProps) {
       <div className="flex items-center gap-2">
         {getWeatherIcon(weather.weather[0].main)}
         <span className="text-lg font-semibold">{Math.round(weather.main.temp)}°C</span>
-        <span className="text-sm text-muted-foreground">{weather.weather[0].main}</span>
+        <span className="text-sm text-muted-foreground">{weather.weather[0].main} in {task.city}</span>
       </div>
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-1">
