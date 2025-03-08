@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
-import { fetchTasks, toggleTask, deleteTask } from "@/store/todoSlice";
+import { toggleTask, deleteTask } from "@/store/todoSlice";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import WeatherInfo from "./WeatherInfo";
@@ -16,23 +16,7 @@ const priorityStyles = {
 
 export default function TaskList() {
   const dispatch = useDispatch<AppDispatch>();
-  const { tasks, loading, error } = useSelector((state: RootState) => state.todos);
-
-  useEffect(() => {
-    dispatch(fetchTasks());
-  }, [dispatch]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return <div className="text-red-500 p-4 text-center">{error}</div>;
-  }
+  const { tasks } = useSelector((state: RootState) => state.todos);
 
   if (tasks.length === 0) {
     return (

@@ -7,15 +7,29 @@ interface WeatherInfoProps {
 }
 
 interface WeatherData {
-  condition: string;
-  temp: number;
-  humidity: number;
-  windSpeed: number;
+  weather: Array<{ main: string }>;
+  main: {
+    temp: number;
+    humidity: number;
+  };
+  wind: {
+    speed: number;
+  };
 }
+
+const WEATHER_API_KEY = "16d4f6d2450759ca1741fcf63413254a";
+const WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5";
 
 export default function WeatherInfo({ task }: WeatherInfoProps) {
   const { data: weather, isLoading, error } = useQuery<WeatherData>({
-    queryKey: ["/api/weather"],
+    queryKey: ["weather"],
+    queryFn: async () => {
+      const response = await fetch(
+        `${WEATHER_BASE_URL}/weather?lat=51.5074&lon=-0.1278&units=metric&appid=${WEATHER_API_KEY}`
+      );
+      if (!response.ok) throw new Error('Failed to fetch weather');
+      return response.json();
+    },
     enabled: task.isOutdoor,
   });
 
@@ -52,18 +66,18 @@ export default function WeatherInfo({ task }: WeatherInfoProps) {
   return (
     <div className="rounded-lg bg-slate-50 p-3 space-y-2">
       <div className="flex items-center gap-2">
-        {getWeatherIcon(weather.condition)}
-        <span className="text-lg font-semibold">{Math.round(weather.temp)}°C</span>
-        <span className="text-sm text-muted-foreground">{weather.condition}</span>
+        {getWeatherIcon(weather.weather[0].main)}
+        <span className="text-lg font-semibold">{Math.round(weather.main.temp)}°C</span>
+        <span className="text-sm text-muted-foreground">{weather.weather[0].main}</span>
       </div>
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-1">
           <Wind className="h-4 w-4" />
-          <span>{weather.windSpeed} m/s</span>
+          <span>{weather.wind.speed} m/s</span>
         </div>
         <div className="flex items-center gap-1">
           <Droplets className="h-4 w-4" />
-          <span>{weather.humidity}%</span>
+          <span>{weather.main.humidity}%</span>
         </div>
       </div>
     </div>
