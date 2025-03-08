@@ -54,6 +54,7 @@ export class MemStorage implements IStorage {
       title: insertTask.title,
       priority: insertTask.priority,
       isOutdoor: insertTask.isOutdoor,
+      dueDate: insertTask.dueDate,
       completed: false,
       weather: null
     };

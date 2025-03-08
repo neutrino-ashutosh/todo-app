@@ -9,9 +9,12 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="bg-white shadow">
+      <header className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Welcome, {user?.username}</h1>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">TaskMaster</h1>
+            <p className="text-sm text-muted-foreground">Welcome back, {user?.username}</p>
+          </div>
           <Button
             variant="ghost"
             size="icon"
@@ -24,9 +27,14 @@ export default function HomePage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow">
+        <div className="grid gap-6">
           <TaskInput />
-          <TaskList />
+          <div className="bg-white rounded-xl shadow-sm">
+            <div className="p-6 border-b">
+              <h2 className="text-lg font-semibold">Your Tasks</h2>
+            </div>
+            <TaskList />
+          </div>
         </div>
       </main>
     </div>

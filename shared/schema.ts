@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, jsonb, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -15,6 +15,7 @@ export const tasks = pgTable("tasks", {
   completed: boolean("completed").notNull().default(false),
   priority: text("priority").notNull().default("medium"),
   isOutdoor: boolean("is_outdoor").notNull().default(false),
+  dueDate: timestamp("due_date"),
   weather: jsonb("weather"),
 });
 
@@ -27,6 +28,7 @@ export const insertTaskSchema = createInsertSchema(tasks).pick({
   title: true,
   priority: true,
   isOutdoor: true,
+  dueDate: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
