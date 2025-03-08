@@ -17,6 +17,7 @@ export const tasks = pgTable("tasks", {
   dueDate: timestamp("due_date"),
   weather: jsonb("weather"),
   city: text("city"), // Added city field
+  important: boolean("important").notNull().default(false) // Added important field
 });
 
 export const insertUserSchema = z.object({
@@ -29,7 +30,8 @@ export const insertTaskSchema = z.object({
   priority: z.enum(["low", "medium", "high"]).default("medium"),
   isOutdoor: z.boolean().default(false),
   dueDate: z.date().nullable(),
-  city: z.string().optional()
+  city: z.string().optional(),
+  important: z.boolean().default(false)
 });
 
 export interface Task {
@@ -42,6 +44,7 @@ export interface Task {
   dueDate: Date | null;
   city?: string;
   weather: any | null;
+  important: boolean;
 }
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

@@ -5,12 +5,12 @@ import { setView } from "@/store/todoSlice";
 import TaskInput from "@/components/TaskInput";
 import TaskList from "@/components/TaskList";
 import { Button } from "@/components/ui/button";
-import { LogOut, AlignJustify, Calendar, Star, List, Users } from "lucide-react";
+import { LogOut, AlignJustify, Calendar, Star, List, Users, Plus } from "lucide-react";
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
   const dispatch = useDispatch<AppDispatch>();
-  const currentView = useSelector((state: RootState) => state.todos.currentView);
+  const { tasks, currentView } = useSelector((state: RootState) => state.todos);
 
   const viewLabels = {
     all: "All Tasks",
@@ -19,6 +19,11 @@ export default function HomePage() {
     planned: "Planned",
     assigned: "Assigned to me"
   };
+
+  // Calculate task completion stats
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(task => task.completed).length;
+  const completionPercentage = totalTasks === 0 ? 0 : (completedTasks / totalTasks) * 100;
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -90,9 +95,42 @@ export default function HomePage() {
               </Button>
             </li>
           </ul>
+
+          <div className="mt-8 border-t pt-4">
+            <Button variant="outline" className="w-full justify-start">
+              <Plus className="mr-2 h-4 w-4" />
+              Add New List
+            </Button>
+          </div>
         </nav>
 
-        <div className="border-t pt-4">
+        <div className="mt-auto pt-4 space-y-4">
+          {/* Task Progress Circle */}
+          <div className="relative w-32 h-32 mx-auto">
+            <svg className="w-full h-full" viewBox="0 0 36 36">
+              <path
+                d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+                fill="none"
+                stroke="#E2E8F0"
+                strokeWidth="3"
+              />
+              <path
+                d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+                fill="none"
+                stroke="#10B981"
+                strokeWidth="3"
+                strokeDasharray={`${completionPercentage}, 100`}
+              />
+              <text x="18" y="20.35" className="fill-gray-900 text-lg font-medium" textAnchor="middle">
+                {completedTasks}/{totalTasks}
+              </text>
+            </svg>
+          </div>
+
           <Button 
             variant="ghost" 
             size="sm" 
@@ -116,7 +154,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">{viewLabels[currentView]} Tasks</h2>
               <div className="flex items-center gap-2">
-                <div className="text-sm text-muted-foreground">11</div>
+                <div className="text-sm text-muted-foreground">{totalTasks}</div>
               </div>
             </div>
             <TaskList />

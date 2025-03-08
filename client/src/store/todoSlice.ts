@@ -29,7 +29,8 @@ export const addTask = createAsyncThunk(
       isOutdoor: task.isOutdoor,
       dueDate: task.dueDate,
       city: task.city,
-      weather: null
+      weather: null,
+      important: task.important || false
     };
     sessionStorage.setItem('currentTaskId', currentId.toString());
     return newTask;
@@ -43,6 +44,16 @@ export const toggleTask = createAsyncThunk(
     const task = state.todos.tasks.find(t => t.id === taskId);
     if (!task) throw new Error('Task not found');
     return { ...task, completed: !task.completed };
+  }
+);
+
+export const toggleImportant = createAsyncThunk(
+  "todos/toggleImportant",
+  async (taskId: number, { getState }) => {
+    const state = getState() as { todos: TodoState };
+    const task = state.todos.tasks.find(t => t.id === taskId);
+    if (!task) throw new Error('Task not found');
+    return { ...task, important: !task.important };
   }
 );
 
@@ -66,6 +77,13 @@ const todoSlice = createSlice({
         sessionStorage.setItem('tasks', JSON.stringify(state.tasks));
       })
       .addCase(toggleTask.fulfilled, (state, action: PayloadAction<Task>) => {
+        const index = state.tasks.findIndex((t) => t.id === action.payload.id);
+        if (index !== -1) {
+          state.tasks[index] = action.payload;
+          sessionStorage.setItem('tasks', JSON.stringify(state.tasks));
+        }
+      })
+      .addCase(toggleImportant.fulfilled, (state, action: PayloadAction<Task>) => {
         const index = state.tasks.findIndex((t) => t.id === action.payload.id);
         if (index !== -1) {
           state.tasks[index] = action.payload;

@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store/store";
-import { toggleTask, deleteTask } from "@/store/todoSlice";
+import { toggleTask, toggleImportant, deleteTask } from "@/store/todoSlice";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import WeatherInfo from "./WeatherInfo";
@@ -17,7 +17,7 @@ export default function TaskList() {
       case 'today':
         return task.dueDate ? isToday(new Date(task.dueDate)) : false;
       case 'important':
-        return task.priority === 'high';
+        return task.important;
       case 'planned':
         return task.dueDate !== null;
       case 'assigned':
@@ -72,9 +72,10 @@ export default function TaskList() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground hover:text-yellow-500"
+                  onClick={() => dispatch(toggleImportant(task.id))}
+                  className={`text-muted-foreground ${task.important ? 'text-yellow-500 hover:text-yellow-600' : 'hover:text-yellow-500'}`}
                 >
-                  <Star className="h-4 w-4" />
+                  <Star className="h-4 w-4" fill={task.important ? "currentColor" : "none"} />
                 </Button>
                 <Button
                   variant="ghost"
