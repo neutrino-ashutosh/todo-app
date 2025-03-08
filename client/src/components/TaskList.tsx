@@ -7,7 +7,11 @@ import WeatherInfo from "./WeatherInfo";
 import { Calendar, Star, Trash2 } from "lucide-react";
 import { format, isToday } from "date-fns";
 
-export default function TaskList() {
+interface TaskListProps {
+  onSelectTask?: (taskId: number) => void;
+}
+
+export default function TaskList({ onSelectTask }: TaskListProps) {
   const dispatch = useDispatch<AppDispatch>();
   const { tasks, currentView } = useSelector((state: RootState) => state.todos);
 
@@ -21,9 +25,9 @@ export default function TaskList() {
       case 'planned':
         return task.dueDate !== null;
       case 'assigned':
-        return true; // In this demo, all tasks are assigned to the user
+        return true;
       default:
-        return true; // 'all' view shows all tasks
+        return true;
     }
   });
 
@@ -33,7 +37,7 @@ export default function TaskList() {
 
   if (filteredTasks.length === 0) {
     return (
-      <div className="text-center p-8 text-muted-foreground">
+      <div className="text-center p-8 text-muted-foreground dark:text-gray-400">
         No tasks yet. Add some tasks to get started!
       </div>
     );
@@ -46,19 +50,21 @@ export default function TaskList() {
         {activeTasks.map((task) => (
           <div
             key={task.id}
-            className="bg-white rounded-lg border p-4 shadow-sm"
+            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+            onClick={() => onSelectTask?.(task.id)}
           >
             <div className="flex items-start gap-3">
               <Checkbox
                 checked={task.completed}
                 onCheckedChange={() => dispatch(toggleTask(task.id))}
                 className="mt-1"
+                onClick={(e) => e.stopPropagation()}
               />
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-gray-900">
+                <h3 className="font-medium text-gray-900 dark:text-white">
                   {task.title}
                 </h3>
-                <div className="mt-2 flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="mt-2 flex items-center gap-3 text-sm text-muted-foreground dark:text-gray-400">
                   {task.dueDate && (
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
@@ -68,7 +74,7 @@ export default function TaskList() {
                   {task.isOutdoor && task.city && <WeatherInfo task={task} />}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -81,7 +87,7 @@ export default function TaskList() {
                   variant="ghost"
                   size="icon"
                   onClick={() => dispatch(deleteTask(task.id))}
-                  className="text-muted-foreground hover:text-red-500"
+                  className="text-muted-foreground hover:text-red-500 dark:hover:text-red-400"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -93,27 +99,32 @@ export default function TaskList() {
 
       {/* Completed Tasks */}
       {completedTasks.length > 0 && (
-        <div className="pt-6 border-t">
-          <h3 className="text-lg font-semibold mb-4">Completed</h3>
+        <div className="pt-6 border-t dark:border-gray-700">
+          <h3 className="text-lg font-semibold mb-4 dark:text-white">Completed</h3>
           <div className="space-y-2">
             {completedTasks.map((task) => (
               <div
                 key={task.id}
-                className="bg-gray-50 rounded-lg border p-4"
+                className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 cursor-pointer"
+                onClick={() => onSelectTask?.(task.id)}
               >
                 <div className="flex items-center gap-3">
                   <Checkbox
                     checked={task.completed}
                     onCheckedChange={() => dispatch(toggleTask(task.id))}
+                    onClick={(e) => e.stopPropagation()}
                   />
-                  <span className="flex-1 line-through text-muted-foreground">
+                  <span className="flex-1 line-through text-muted-foreground dark:text-gray-500">
                     {task.title}
                   </span>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => dispatch(deleteTask(task.id))}
-                    className="text-muted-foreground hover:text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      dispatch(deleteTask(task.id));
+                    }}
+                    className="text-muted-foreground hover:text-red-500 dark:hover:text-red-400"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
